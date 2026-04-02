@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Music Generator</title>
+<style>
+body { background:#0b0f14; color:#fff; font-family:sans-serif; text-align:center; }
+button { padding:15px 25px; margin:10px; border:none; border-radius:8px; background:#1f6feb; color:white; font-size:16px; cursor:pointer; }
+</style>
+</head>
+<body>
+<h1>Music Generator</h1>
+<p>Click generate to create procedural music (no API key needed)</p>
+<button onclick="startMusic()">Generate</button>
+<button onclick="stopMusic()">Stop</button>
+
+<script>
+let ctx;
+let oscillators = [];
+
+function randomNote() {
+  const notes = [220, 246.94, 261.63, 293.66, 329.63, 349.23, 392.00];
+  return notes[Math.floor(Math.random()*notes.length)];
+}
+
+function startMusic() {
+  if (ctx) return;
+  ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+  for (let i = 0; i < 3; i++) {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = ['sine','square','triangle'][i%3];
+    osc.frequency.value = randomNote();
+
+    gain.gain.value = 0.1;
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start();
+    oscillators.push({osc, gain});
+
+    setInterval(() => {
+      osc.frequency.setValueAtTime(randomNote(), ctx.currentTime);
+    }, 400);
+  }
+}
+
+function stopMusic() {
+  oscillators.forEach(o => o.osc.stop());
+  oscillators = [];
+  if (ctx) ctx.close();
+  ctx = null;
+}
+</script>
+</body>
+</html>
