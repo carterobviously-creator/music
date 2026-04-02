@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>AI Music Generator</title>
+<style>
+body{background:#0b0f14;color:#fff;font-family:sans-serif;text-align:center;padding:40px}
+input,button{padding:12px;margin:10px;border-radius:8px;border:none}
+input{width:300px}
+button{background:#1f6feb;color:#fff;cursor:pointer}
+audio{margin-top:20px;width:80%}
+</style>
+</head>
+<body>
+<h1>AI Music Generator</h1>
+<p>Enter a prompt (lofi, edm, dark ambient...)</p>
+<input id="prompt" placeholder="type vibe..." />
+<br>
+<button onclick="generate()">Generate Music</button>
+<audio id="player" controls></audio>
+
+<script>
+async function generate(){
+  const prompt=document.getElementById('prompt').value;
+  const res=await fetch('https://api-inference.huggingface.co/models/facebook/musicgen-small',{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json'
+    },
+    body:JSON.stringify({inputs:prompt})
+  });
+
+  const blob=await res.blob();
+  const url=URL.createObjectURL(blob);
+  document.getElementById('player').src=url;
+}
+</script>
+</body>
+</html>
